@@ -69,7 +69,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <nav class="mb-6 text-sm" aria-label="Breadcrumb">
             <ol class="list-none p-0 inline-flex">
                 <li class="flex items-center">
-                    <a href="./admin_dashboard.php" class="text-slate-500 hover:text-blue-600">
+                    <a href="../views/admin_dashboard.php" class="text-slate-500 hover:text-blue-600">
                         <i class="fas fa-tachometer-alt mr-2"></i>Dashboard Admin
                     </a>
                 </li>

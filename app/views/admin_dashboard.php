@@ -3,7 +3,7 @@ session_start();
 // Guard: Cek jika pengguna sudah login dan rolenya adalah Admin
 if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'Admin') {
     // Jika tidak, tendang ke halaman login
-    header('Location: Auth/login.php');
+    header('Location: ../../Auth/login.php');
     exit;
 }
 
@@ -65,7 +65,7 @@ if (!isset($_SESSION['nama_lengkap'])) {
                 <a href="#" class="flex items-center py-3 px-6 hover:bg-gray-700 transition duration-200">
                     <i class="fas fa-chart-line w-6 text-center"></i><span class="ml-4">Laporan</span>
                 </a>
-                <a href="./manage_user.php" class="flex items-center py-3 px-6 hover:bg-gray-700 transition duration-200">
+                <a href="../model/manage_user.php" class="flex items-center py-3 px-6 hover:bg-gray-700 transition duration-200">
                     <i class="fas fa-users w-6 text-center"></i><span class="ml-4">Manajemen Pengguna</span>
                 </a>
                 <a href="#" class="flex items-center py-3 px-6 hover:bg-gray-700 transition duration-200">
@@ -173,7 +173,7 @@ if (!isset($_SESSION['nama_lengkap'])) {
                                 <h3 class="text-xl font-semibold ml-4 text-gray-800">Manajemen Pengguna</h3>
                             </div>
                             <p class="text-gray-600 mt-3">Tambah atau nonaktifkan akun pengguna lain (misal: Staf Gudang) dan atur hak aksesnya.</p>
-                            <a href="./manage_user.php" class="inline-block mt-4 text-indigo-600 font-semibold hover:underline">Kelola Sekarang &rarr;</a>
+                            <a href="../model/manage_user.php" class="inline-block mt-4 text-indigo-600 font-semibold hover:underline">Kelola Sekarang &rarr;</a>
                         </div>
 
                         <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">

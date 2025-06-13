@@ -5,13 +5,13 @@ session_start();
 // Guard: Hanya Admin yang bisa mengakses file ini
 if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'Admin') {
     // Redirect dengan pesan error jika diakses tanpa hak
-    header('Location: ../views/manage_user.php?status=error&message=Akses ditolak.');
+    header('Location: ../model/manage_user.php?status=error&message=Akses ditolak.');
     exit;
 }
 
 // Periksa apakah metode request adalah POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../views/manage_user.php');
+    header('Location: ../model/manage_user.php');
     exit;
 }
 
@@ -31,7 +31,7 @@ if ($action == 'create') {
 
     // Validasi input
     if (empty($nama_lengkap) || empty($username) || empty($password) || empty($role)) {
-        header('Location: ../views/manage_user.php?status=error&message=Semua field wajib diisi.');
+        header('Location: ../model/manage_user.php?status=error&message=Semua field wajib diisi.');
         exit;
     }
 
@@ -42,7 +42,7 @@ if ($action == 'create') {
     $check_stmt->execute();
 
     if ($check_stmt->rowCount() > 0) {
-        header('Location: ../views/manage_user.php?status=error&message=Username sudah digunakan.');
+        header('Location: ../model/manage_user.php?status=error&message=Username sudah digunakan.');
         exit;
     }
 
@@ -60,9 +60,9 @@ if ($action == 'create') {
     $stmt->bindParam(':role', $role);
 
     if ($stmt->execute()) {
-        header('Location: ../views/manage_user.php?status=success&message=Pengguna berhasil ditambahkan.');
+        header('Location: ../model/manage_user.php?status=success&message=Pengguna berhasil ditambahkan.');
     } else {
-        header('Location: ../views/manage_user.php?status=error&message=Gagal menambahkan pengguna.');
+        header('Location: ../model/manage_user.php?status=error&message=Gagal menambahkan pengguna.');
     }
 }
 
@@ -76,7 +76,7 @@ elseif ($action == 'update') {
 
     // Validasi input
     if (empty($id) || empty($nama_lengkap) || empty($username) || empty($role)) {
-        header('Location: ../views/manage_user.php?status=error&message=Data tidak lengkap.');
+        header('Location: ../model/manage_user.php?status=error&message=Data tidak lengkap.');
         exit;
     }
 
@@ -87,7 +87,7 @@ elseif ($action == 'update') {
     $check_stmt->bindParam(':id', $id);
     $check_stmt->execute();
     if ($check_stmt->rowCount() > 0) {
-        header('Location: ../views/manage_user.php?status=error&message=Username sudah digunakan oleh pengguna lain.');
+        header('Location: ../model/manage_user.php?status=error&message=Username sudah digunakan oleh pengguna lain.');
         exit;
     }
 
@@ -115,9 +115,9 @@ elseif ($action == 'update') {
     $stmt = $db->prepare($query);
 
     if ($stmt->execute($params)) {
-        header('Location: ../views/manage_user.php?status=success&message=Data pengguna berhasil diperbarui.');
+        header('Location: ../model/manage_user.php?status=success&message=Data pengguna berhasil diperbarui.');
     } else {
-        header('Location: ../views/manage_user.php?status=error&message=Gagal memperbarui data.');
+        header('Location: ../model/manage_user.php?status=error&message=Gagal memperbarui data.');
     }
 }
 
@@ -126,7 +126,7 @@ elseif ($action == 'delete') {
     $id = $_POST['id'];
 
     if (empty($id)) {
-        header('Location: ../views/manage_user.php?status=error&message=ID pengguna tidak valid.');
+        header('Location: ../model/manage_user.php?status=error&message=ID pengguna tidak valid.');
         exit;
     }
 
@@ -135,14 +135,14 @@ elseif ($action == 'delete') {
     $stmt->bindParam(':id', $id);
 
     if ($stmt->execute()) {
-        header('Location: ../views/manage_user.php?status=success&message=Pengguna berhasil dihapus.');
+        header('Location: ../model/manage_user.php?status=success&message=Pengguna berhasil dihapus.');
     } else {
-        header('Location: ../views/manage_user.php?status=error&message=Gagal menghapus pengguna.');
+        header('Location: ../model/manage_user.php?status=error&message=Gagal menghapus pengguna.');
     }
 }
 
 // Jika aksi tidak dikenali
 else {
-    header('Location: ../views/manage_user.php');
+    header('Location: ../model/manage_user.php');
 }
 ?>
