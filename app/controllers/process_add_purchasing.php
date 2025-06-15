@@ -3,14 +3,14 @@ session_start();
 require '../../config/Database.php';
 
 // -- PENGATURAN PENGGUNA & PERAN (diaktifkan di produksi) --
-/*
+
 if (!isset($_SESSION['loggedin']) || !in_array($_SESSION['role'], ['Purchasing', 'Admin'])) {
     $_SESSION['message'] = "Anda tidak memiliki izin untuk mengakses halaman ini.";
     $_SESSION['message_type'] = "error";
     header('Location: ../views/Auth/login.php');
     exit;
 }
-*/
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../model/add_purchasing.php');

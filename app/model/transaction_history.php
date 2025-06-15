@@ -56,6 +56,12 @@ function e($string)
                             <span class="block text-xs text-gray-500"><?= e($_SESSION['role']) ?></span>
                         </div>
                     </button>
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"><i class="fas fa-user-circle w-5 mr-2"></i>Profil</a>
+                        <button type="button" class="logout-trigger block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-100">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i>Logout
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -66,6 +72,9 @@ function e($string)
                             <h1 class="text-3xl font-bold text-slate-800">Riwayat Transaksi Pembelian</h1>
                             <p class="mt-2 text-slate-600">Semua catatan pembelian barang yang masuk ke inventaris.</p>
                         </div>
+                        <a href="../views/purchasing_dashboard.php" class="bg-slate-200 text-slate-600 hover:bg-slate-300 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Kembali
+                        </a>
                     </div>
 
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -122,6 +131,18 @@ function e($string)
             </main>
         </div>
     </div>
+    <div id="logout-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm mx-auto text-center transform transition-all scale-95 opacity-0" id="logout-modal-content">
+            <div class="mb-4"><i class="fas fa-exclamation-triangle text-5xl text-yellow-400"></i></div>
+            <h3 class="text-2xl font-bold text-gray-800">Anda Yakin?</h3>
+            <p class="text-gray-600 my-2">Apakah Anda benar-benar ingin keluar dari sesi ini?</p>
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="cancel-logout-btn" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold py-2 px-6 rounded-lg transition-colors">Batal</button>
+                <a href="../../Auth/logout.php" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">Yakin, Keluar</a>
+            </div>
+        </div>
+    </div>
+    <script src="../asset/lib/purchase.js"></script>
 </body>
 
 </html>
