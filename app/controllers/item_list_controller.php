@@ -6,10 +6,7 @@ session_start();
 require_once '../../config/Database.php'; 
 
 // 2. FUNGSI BANTU (HELPERS)
-function e($string)
-{
-    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
-}
+
 
 // 3. LOGIKA UTAMA (OTAK DARI HALAMAN)
 
@@ -69,4 +66,4 @@ try {
 // Setelah semua data siap, panggil file View-nya.
 // Controller memberikan semua variabel yang sudah diolah ke View.
 // Path dari 'app/controllers/' ke 'app/model/' adalah '../model/'
-require_once '../model/item_list_view.php';
+require_once '../model/item_list.php';

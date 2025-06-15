@@ -27,7 +27,7 @@ $db_error = null;
 try {
     $database = new Database();
     $db = $database->getConnection();
-    
+
     // 1. Menghitung Total Jenis Barang (unik)
     $query1 = "SELECT COUNT(DISTINCT nama_barang) as total FROM barang";
     $stmt1 = $db->prepare($query1);
@@ -62,7 +62,6 @@ try {
     $stmt4->bindParam(':today', $today);
     $stmt4->execute();
     $barang_keluar_hari_ini = $stmt4->fetchColumn();
-
 } catch (PDOException $e) {
     // Jika terjadi error koneksi atau query
     $db_error = "Error koneksi database: " . $e->getMessage();
@@ -89,7 +88,7 @@ try {
 <body class="bg-slate-100 font-sans">
 
     <div class="relative min-h-screen md:flex">
-        
+
         <?php
         $currentPage = 'dashboard';
         include '../components/sidebar.php';
@@ -125,9 +124,9 @@ try {
                     </div>
 
                     <?php if ($db_error): ?>
-                    <div class="mb-6 p-4 rounded-lg bg-red-100 text-red-800" role="alert">
-                        <strong>Error:</strong> <?= e($db_error) ?>
-                    </div>
+                        <div class="mb-6 p-4 rounded-lg bg-red-100 text-red-800" role="alert">
+                            <strong>Error:</strong> <?= e($db_error) ?>
+                        </div>
                     <?php endif; ?>
 
                     <!-- Kartu Ringkasan dengan Data Dinamis -->
@@ -139,14 +138,14 @@ try {
                             </div>
                             <div class="text-sky-500"><i class="fas fa-boxes-stacked fa-2x"></i></div>
                         </div>
-                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
                             <div>
                                 <p class="text-sm font-medium text-slate-500">Stok Menipis</p>
                                 <p class="text-3xl font-bold text-amber-500"><?= number_format($stok_menipis_count) ?></p>
                             </div>
                             <div class="text-amber-500"><i class="fas fa-exclamation-triangle fa-2x"></i></div>
                         </div>
-                         <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
                             <div>
                                 <p class="text-sm font-medium text-slate-500">Barang Masuk (Hari Ini)</p>
                                 <p class="text-3xl font-bold text-slate-800"><?= number_format($barang_masuk_hari_ini) ?></p>
@@ -165,44 +164,35 @@ try {
                     <!-- Akses Cepat (Path disesuaikan) -->
                     <h2 class="text-2xl font-bold text-slate-800 mb-6">Menu Akses Cepat</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        
-                        <a href="../controllers/item_list_controller.php" class="card-link-wrapper">
-                             <div class="bg-white p-6 rounded-lg shadow-md h-full flex flex-col justify-between transition-all hover:shadow-xl hover:border-sky-500 border-2 border-transparent">
-                                <div>
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-boxes-stacked text-2xl text-slate-500"></i>
-                                        <h3 class="text-xl font-semibold ml-4 text-slate-800">Manajemen Barang</h3>
-                                    </div>
-                                    <p class="text-slate-600 text-sm">Lihat, tambah, edit, dan hapus data master semua barang.</p>
-                                </div>
-                                <div class="mt-4 text-sky-600 font-semibold text-sm">Kelola Sekarang <i class="fas fa-arrow-right ml-1"></i></div>
-                            </div>
+
+                        <a href="#" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
+                            <div class="flex items-center mb-3 text-sky-500"><i class="fas fa-chart-line fa-2x"></i></div>
+                            <h3 class="text-xl font-semibold text-slate-800">Laporan</h3>
+                            <p class="text-slate-500 text-sm mt-1">Lihat laporan penjualan, pembelian, dan keuntungan.</p>
                         </a>
-                        
-                        <a href="../model/transaction_history.php" class="card-link-wrapper">
-                             <div class="bg-white p-6 rounded-lg shadow-md h-full flex flex-col justify-between transition-all hover:shadow-xl hover:border-sky-500 border-2 border-transparent">
-                                <div>
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-history text-2xl text-slate-500"></i>
-                                        <h3 class="text-xl font-semibold ml-4 text-slate-800">Riwayat Transaksi</h3>
-                                    </div>
-                                    <p class="text-slate-600 text-sm">Lacak semua riwayat transaksi pembelian dan penjualan barang.</p>
-                                 </div>
-                                 <div class="mt-4 text-sky-600 font-semibold text-sm">Lihat Riwayat <i class="fas fa-arrow-right ml-1"></i></div>
-                            </div>
+
+                        <a href="../model/item_list.php" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
+                            <div class="flex items-center mb-3 text-teal-500"><i class="fas fa-boxes-stacked fa-2x"></i></div>
+                            <h3 class="text-xl font-semibold text-slate-800">Manajemen Barang</h3>
+                            <p class="text-slate-500 text-sm mt-1">Kelola data master semua barang di inventaris.</p>
                         </a>
-                        
-                        <a href="../model/manage_user.php" class="card-link-wrapper">
-                             <div class="bg-white p-6 rounded-lg shadow-md h-full flex flex-col justify-between transition-all hover:shadow-xl hover:border-sky-500 border-2 border-transparent">
-                                 <div>
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-users-cog text-2xl text-slate-500"></i>
-                                        <h3 class="text-xl font-semibold ml-4 text-slate-800">Manajemen Pengguna</h3>
-                                    </div>
-                                    <p class="text-slate-600 text-sm">Tambah atau nonaktifkan akun dan atur hak aksesnya.</p>
-                                 </div>
-                                <div class="mt-4 text-sky-600 font-semibold text-sm">Kelola Pengguna <i class="fas fa-arrow-right ml-1"></i></div>
-                            </div>
+
+                        <a href="#" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
+                            <div class="flex items-center mb-3 text-indigo-500"><i class="fas fa-chart-bar fa-2x"></i></div>
+                            <h3 class="text-xl font-semibold text-slate-800">Penjualan Terlaris</h3>
+                            <p class="text-slate-500 text-sm mt-1">Analisa tren barang yang paling laku di pasaran.</p>
+                        </a>
+
+                        <a href="../model/transaction_history.php" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
+                            <div class="flex items-center mb-3 text-purple-500"><i class="fas fa-history fa-2x"></i></div>
+                            <h3 class="text-xl font-semibold text-slate-800">Riwayat Transaksi</h3>
+                            <p class="text-slate-500 text-sm mt-1">Lacak semua aktivitas pembelian dan penjualan.</p>
+                        </a>
+
+                        <a href="../model/manage_user.php" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
+                            <div class="flex items-center mb-3 text-slate-500"><i class="fas fa-users-cog fa-2x"></i></div>
+                            <h3 class="text-xl font-semibold text-slate-800">Manajemen Pengguna</h3>
+                            <p class="text-slate-500 text-sm mt-1">Atur hak akses dan akun untuk setiap peran.</p>
                         </a>
                     </div>
                 </div>

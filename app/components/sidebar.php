@@ -59,14 +59,14 @@ $userRole = $_SESSION['role'] ?? 'Guest'; // Default ke 'Guest' kalo session gak
                 <a href="#" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'reports') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-chart-line w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Laporan</span>
                 </a>
-                <a href="<?= BASE_URL ?>app/controllers/item_list_controller.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'items') ? $activeClass : $inactiveClass ?>">
+                <a href="<?= BASE_URL ?>app/model/manage_stock.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'items') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-boxes-stacked w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Manajemen Barang</span>
                 </a>
                  <a href="<?= BASE_URL ?>app/model/trending_sales.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'trending') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-chart-bar w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Penjualan Terlaris</span>
                 </a>
-                <a href="<?= BASE_URL ?>app/model/customer_list.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'customers') ? $activeClass : $inactiveClass ?>">
-                    <i class="fas fa-users w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Daftar Pelanggan</span>
+                <a href="<?= BASE_URL ?>app/model/transaction_history.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'history') ? $activeClass : $inactiveClass ?>">
+                    <i class="fas fa-history w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Riwayat Transaksi</span>
                 </a>
                 <a href="<?= BASE_URL ?>app/model/manage_user.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'manage_user') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-users-cog w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Manajemen Pengguna</span>
@@ -102,15 +102,15 @@ $userRole = $_SESSION['role'] ?? 'Guest'; // Default ke 'Guest' kalo session gak
                 <a href="<?= BASE_URL ?>app/views/sales_dashboard.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'dashboard') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-tachometer-alt w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Dashboard</span>
                 </a>
-                <a href="<?= BASE_URL ?>app/model/add_invoice.php.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'invoice') ? $activeClass : $inactiveClass ?>">
+                <a href="<?= BASE_URL ?>app/model/add_nota.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'invoice') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-file-invoice-dollar w-6 text-center text-lg"></i>
-                    <span class="sidebar-text ml-4">Buat Invoice</span>
+                    <span class="sidebar-text ml-4">Buat Nota</span>
                 </a>
                 <a href="<?= BASE_URL ?>app/model/transaction_history.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'history') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-history w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Riwayat Penjualan</span>
                 </a>
-              <a href="<?= BASE_URL ?>app/model/cek_harga.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'customers') ? $activeClass : $inactiveClass ?>">
-                    <i class="fas fa-tags w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Cek Harga</span>
+                <a href="<?= BASE_URL ?>app/controllers/item_list_controller.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'items') ? $activeClass : $inactiveClass ?>">
+                    <i class="fas fa-boxes-stacked w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Daftar Barang</span>
                 </a>
             <?php
             endif;

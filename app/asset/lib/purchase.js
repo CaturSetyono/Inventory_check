@@ -86,3 +86,69 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === logoutModal) toggleLogoutModal(false);
   });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (Kode sidebar, profil, logout, dan chart tidak berubah) ...
+
+    // === KODE UNTUK MANAJEMEN STOK (EDIT & DELETE) ===
+    const initStockManagement = () => {
+        const stockTable = document.getElementById('stock-table');
+        if (!stockTable) return;
+
+        stockTable.addEventListener('click', (e) => {
+            const cell = e.target.closest('.editable');
+            if (cell && !cell.querySelector('input')) {
+                // ... (logika untuk mengubah jadi input tidak berubah) ...
+
+                const saveChanges = async () => {
+                    const newValue = input.value.trim();
+                    if (newValue === originalValue) {
+                        cell.innerHTML = (field === 'harga_beli') ? new Intl.NumberFormat('id-ID').format(originalValue) : originalValue;
+                        return;
+                    }
+                    
+                    const id = cell.parentElement.dataset.id;
+                    // PERUBAHAN DI SINI: URL dan body dari fetch
+                    const response = await fetch('../controllers/stock_manager_controller.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'update', id, field, value: newValue })
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        cell.innerHTML = (field === 'harga_beli') ? new Intl.NumberFormat('id-ID').format(newValue) : newValue;
+                    } else {
+                        alert('Gagal update: ' + result.message);
+                        cell.innerHTML = (field === 'harga_beli') ? new Intl.NumberFormat('id-ID').format(originalValue) : originalValue;
+                    }
+                };
+                
+                // ... (event listener untuk input tidak berubah) ...
+            }
+
+            const deleteButton = e.target.closest('.delete-btn');
+            if (deleteButton) {
+                const id = deleteButton.dataset.id;
+                const name = deleteButton.dataset.name;
+                if (confirm(`Yakin mau menghapus barang "${name}"? Semua data transaksi terkait juga akan dihapus.`)) {
+                    // PERUBAHAN DI SINI: URL dan body dari fetch
+                    fetch('../controllers/stock_manager_controller.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', id })
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            deleteButton.closest('tr').remove();
+                        } else {
+                            alert('Gagal hapus: ' . result.message);
+                        }
+                    });
+                }
+            }
+        });
+    };
+
+    initStockManagement();
+});

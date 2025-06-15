@@ -60,7 +60,7 @@ try {
 }
 
 // Placeholder untuk target
-$target_penjualan_bulanan = 50000000;
+$target_penjualan_bulanan = 2000000;
 $persentase_target = ($target_penjualan_bulanan > 0) ? ($penjualan_bulanan / $target_penjualan_bulanan) * 100 : 0;
 ?>
 <!DOCTYPE html>
@@ -96,7 +96,14 @@ $persentase_target = ($target_penjualan_bulanan > 0) ? ($penjualan_bulanan / $ta
                             <span class="block text-xs text-slate-500"><?= e($_SESSION['role']) ?></span>
                         </div>
                     </button>
+                     <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20">
+                        <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"><i class="fas fa-user-circle w-5 mr-2"></i>Profil</a>
+                        <button type="button" class="logout-trigger block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-100">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i>Logout
+                        </button>
                     </div>
+                    </div>
+                    
             </header>
 
             <main class="flex-1 overflow-y-auto p-6 md:p-8">
@@ -107,8 +114,8 @@ $persentase_target = ($target_penjualan_bulanan > 0) ? ($penjualan_bulanan / $ta
                             <p class="mt-2 text-slate-600">Ringkasan performa penjualan dan aktivitas terkini.</p>
                         </div>
                         <div>
-                            <a href="<?= BASE_URL ?>app/model/add_invoice.php" class="bg-sky-500 text-white font-bold py-3 px-5 rounded-lg shadow-md hover:bg-sky-600 transition-all transform hover:-translate-y-0.5 flex items-center">
-                                <i class="fas fa-plus mr-2"></i>Buat Invoice Baru
+                            <a href="<?= BASE_URL ?>app/model/add_nota.php" class="bg-sky-500 text-white font-bold py-3 px-5 rounded-lg shadow-md hover:bg-sky-600 transition-all transform hover:-translate-y-0.5 flex items-center">
+                                <i class="fas fa-plus mr-2"></i>Buat Nota Baru
                             </a>
                         </div>
                     </div>
@@ -196,14 +203,6 @@ $persentase_target = ($target_penjualan_bulanan > 0) ? ($penjualan_bulanan / $ta
                                     </div>
                                 </div>
                             </div>
-
-                            <a href="<?= BASE_URL ?>app/model/cek_harga.php" class="bg-white p-6 rounded-lg shadow-md transition-all hover:shadow-lg hover:border-sky-500 border-2 border-transparent flex items-start gap-4">
-                                <i class="fas fa-tags text-3xl text-sky-500 mt-1"></i>
-                                <div>
-                                    <h3 class="font-bold text-lg text-slate-800">Cek Harga Jual</h3>
-                                    <p class="text-sm text-slate-500 mt-1">Gunakan metode FIFO untuk menghitung harga pokok penjualan (HPP) barang.</p>
-                                </div>
-                            </a>
                         </div>
 
                     </div>
@@ -211,6 +210,18 @@ $persentase_target = ($target_penjualan_bulanan > 0) ? ($penjualan_bulanan / $ta
             </main>
         </div>
     </div>
+     <div id="logout-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm mx-auto text-center transform transition-all scale-95 opacity-0" id="logout-modal-content">
+            <div class="mb-4"><i class="fas fa-exclamation-triangle text-5xl text-yellow-400"></i></div>
+            <h3 class="text-2xl font-bold text-gray-800">Anda Yakin?</h3>
+            <p class="text-gray-600 my-2">Apakah Anda benar-benar ingin keluar dari sesi ini?</p>
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="cancel-logout-btn" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold py-2 px-6 rounded-lg transition-colors">Batal</button>
+                <a href="../../Auth/logout.php" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">Yakin, Keluar</a>
+            </div>
+        </div>
+    </div>
+
     <script src="../asset/lib/purchase.js"></script>
 </body>
 </html>

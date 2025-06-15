@@ -1,8 +1,9 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // Path ke Database.php saya sesuaikan agar konsisten dengan path lain di file ini.
 require_once '../../config/Database.php'; 
-
 // -- PENGATURAN PENGGUNA & PERAN --
 // (Tidak ada perubahan di sini)
 /*
@@ -16,10 +17,6 @@ if (!isset($_SESSION['nama_lengkap'])) {
     $_SESSION['role'] = 'Purchasing';
 }
 
-function e($string)
-{
-    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
-}
 
 // -- LOGIKA PAGINATION --
 $limit = 30; // 1. Jumlah item per halaman
@@ -111,9 +108,7 @@ try {
                             <h1 class="text-3xl font-bold text-slate-800">Daftar Barang</h1>
                             <p class="mt-2 text-slate-600">Lihat semua data barang yang tersimpan di database.</p>
                         </div>
-                        <a href="../model/add_purchasing.php" class="bg-sky-500 text-white hover:bg-sky-600 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center">
-                            <i class="fas fa-plus mr-2"></i> Tambah Barang
-                        </a>
+                        
                     </div>
 
                     <div class="bg-white p-6 md:p-8 rounded-lg shadow-md overflow-x-auto">
