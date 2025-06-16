@@ -18,6 +18,7 @@ function e($string)
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +28,7 @@ function e($string)
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../asset/css/purchase.css">
 </head>
+
 <body class="bg-slate-100">
 
     <div class="relative min-h-screen md:flex">
@@ -36,8 +38,26 @@ function e($string)
         ?>
 
         <div id="main-content" class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm p-4 h-16 flex justify-between items-center z-10">
-                </header>
+            <header class="bg-white p-4 h-16 flex justify-between items-center z-10">
+                <button id="sidebar-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none bg-slate-200/70 hover:bg-slate-300 w-10 h-10 rounded-full flex items-center justify-center">
+                    <i id="sidebar-toggle-icon" class="fas fa-chevron-left text-xl"></i>
+                </button>
+                <div class="relative">
+                    <button id="profile-button" class="flex items-center space-x-3">
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['nama_lengkap']) ?>&background=0ea5e9&color=fff&size=128" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-slate-300">
+                        <div class="hidden md:block text-right">
+                            <span class="font-semibold text-slate-800 text-sm"><?= e($_SESSION['nama_lengkap']) ?></span>
+                            <span class="block text-xs text-slate-500"><?= e($_SESSION['role']) ?></span>
+                        </div>
+                    </button>
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20">
+                        <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"><i class="fas fa-user-circle w-5 mr-2"></i>Profil</a>
+                        <button type="button" class="logout-trigger block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-100">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
 
             <main class="flex-1 overflow-y-auto p-6 md:p-8">
                 <div class="container mx-auto">
@@ -46,9 +66,7 @@ function e($string)
                             <h1 class="text-3xl font-bold text-slate-800"><?= e($pageTitle) ?></h1>
                             <p class="mt-2 text-slate-600"><?= e($pageSubtitle) ?></p>
                         </div>
-                        <a href="../views/purchasing_dashboard.php" class="bg-slate-200 text-slate-600 hover:bg-slate-300 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center">
-                            <i class="fas fa-arrow-left mr-2"></i> Kembali
-                        </a>
+
                     </div>
 
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -56,6 +74,7 @@ function e($string)
                             <table class="w-full text-sm text-left text-gray-500">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
+                                        <th scope="col" class="px-6 py-3 w-16 text-center">No.</th>
                                         <th scope="col" class="px-6 py-3">Tanggal</th>
                                         <th scope="col" class="px-6 py-3">Nama Barang</th>
                                         <th scope="col" class="px-6 py-3 text-center">Tipe</th>
@@ -67,15 +86,20 @@ function e($string)
                                 <tbody>
                                     <?php if ($error_message): ?>
                                         <tr class="bg-white border-b">
-                                            <td colspan="6" class="px-6 py-4 text-center text-red-500"><?= e($error_message) ?></td>
+                                            <td colspan="7" class="px-6 py-4 text-center text-red-500"><?= e($error_message) ?></td>
                                         </tr>
                                     <?php elseif (empty($transactions)): ?>
                                         <tr class="bg-white border-b">
-                                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada data transaksi untuk ditampilkan.</td>
+                                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">Belum ada data transaksi untuk ditampilkan.</td>
                                         </tr>
                                     <?php else: ?>
+                                        <?php
+                                        // AWAL PERUBAHAN: Inisialisasi nomor urut
+                                        $nomor = (($page - 1) * $limit) + 1;
+                                        ?>
                                         <?php foreach ($transactions as $trans): ?>
                                             <tr class="bg-white border-b hover:bg-gray-50">
+                                                <td class="px-6 py-4 font-medium text-gray-900 text-center"><?= $nomor++ ?></td>
                                                 <td class="px-6 py-4 font-medium text-gray-900"><?= e(date('d M Y', strtotime($trans['tanggal']))) ?></td>
                                                 <td class="px-6 py-4"><?= e($trans['nama_barang']) ?></td>
                                                 <td class="px-6 py-4 text-center">
@@ -95,9 +119,51 @@ function e($string)
                             </table>
                         </div>
                     </div>
+
+                    <?php if ($total_pages > 1 && !$error_message && !empty($transactions)): ?>
+                        <div class="mt-8 flex justify-center" aria-label="Pagination">
+                            <nav class="flex items-center space-x-2">
+                                <a href="?page=<?= $page > 1 ? $page - 1 : 1 ?>"
+                                    class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-300 bg-white text-slate-600 transition-colors hover:bg-slate-100 <?= $page <= 1 ? 'bg-slate-100 text-slate-400 pointer-events-none' : '' ?>">
+                                    <span class="sr-only">Previous</span>
+                                    <i class="fas fa-chevron-left text-sm"></i>
+                                </a>
+
+                                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                    <a href="?page=<?= $i ?>"
+                                        aria-current="<?= $i == $page ? 'page' : 'false' ?>"
+                                        class="flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-colors
+               <?= $i == $page ? 'bg-sky-500 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100' ?>">
+                                        <?= $i ?>
+                                    </a>
+                                <?php endfor; ?>
+
+                                <a href="?page=<?= $page < $total_pages ? $page + 1 : $total_pages ?>"
+                                    class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-300 bg-white text-slate-600 transition-colors hover:bg-slate-100 <?= $page >= $total_pages ? 'bg-slate-100 text-slate-400 pointer-events-none' : '' ?>">
+                                    <span class="sr-only">Next</span>
+                                    <i class="fas fa-chevron-right text-sm"></i>
+                                </a>
+                            </nav>
+                        </div>
+                    <?php endif; ?>
                 </div>
-            </main>
+
+        </div>
+        </main>
+    </div>
+    </div>
+    <div id="logout-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm mx-auto text-center transform transition-all scale-95 opacity-0" id="logout-modal-content">
+            <div class="mb-4"><i class="fas fa-exclamation-triangle text-5xl text-yellow-400"></i></div>
+            <h3 class="text-2xl font-bold text-gray-800">Anda Yakin?</h3>
+            <p class="text-gray-600 my-2">Apakah Anda benar-benar ingin keluar dari sesi ini?</p>
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="cancel-logout-btn" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold py-2 px-6 rounded-lg transition-colors">Batal</button>
+                <a href="../../Auth/logout.php" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">Yakin, Keluar</a>
+            </div>
         </div>
     </div>
+    <script src="../asset/lib/purchase.js"></script>
 </body>
+
 </html>

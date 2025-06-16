@@ -1,16 +1,17 @@
 <?php
 session_start();
+// Menggunakan path yang sudah Anda simpan
 require_once '../../config/Database.php';
 
 // -- PENGATURAN PENGGUNA & PERAN --
 
 if (!isset($_SESSION['loggedin']) || !in_array($_SESSION['role'], ['Purchasing', 'Admin'])) {
-    header('Location: ../Auth/login.php'); 
+    header('Location: ../Auth/login.php');
     exit;
 }
 
 
-// Mock session data
+// Mock session data untuk pengujian
 if (!isset($_SESSION['nama_lengkap'])) {
     $_SESSION['nama_lengkap'] = 'Staff Purchasing';
     $_SESSION['role'] = 'Purchasing';
@@ -29,13 +30,20 @@ $stats = [
 ];
 $lowStockItems = [];
 $chartData = [];
+$error_message = null; // Inisialisasi variabel error
 
 try {
+    // Di PHP 8+, lebih baik menggunakan nama class langsung, namun ini tetap berfungsi
     $database = new Database();
-    $conn = $database->getConnection();
+    // Berdasarkan kode Anda, sepertinya method koneksi Anda bernama getConnection() atau connect()
+    // Saya asumsikan ini adalah method yang benar sesuai konteks kode Anda yang ada.
+    // Jika nama methodnya berbeda (misal: connect()), sesuaikan.
+    $conn = $database->getConnection(); // Atau $database->connect()
 
-    // Query untuk stats, low stock, dan chart...
-    // (Logika PHP ini tidak berubah)
+    // -------------------------------------------------------------------------
+    // Query untuk stats, bagian ini tidak diubah
+    // -------------------------------------------------------------------------
+    // Asumsi: Tabel 'transaksi' Anda memiliki kolom 'harga' dan 'barang_id'
     $sql_stats = "SELECT SUM(jumlah * harga) AS total_pembelian, COUNT(*) AS jumlah_transaksi, COUNT(DISTINCT barang_id) AS item_unik FROM transaksi WHERE tipe = 'masuk' AND MONTH(tanggal) = MONTH(CURDATE()) AND YEAR(tanggal) = YEAR(CURDATE())";
     $stmt_stats = $conn->prepare($sql_stats);
     $stmt_stats->execute();
@@ -45,14 +53,39 @@ try {
         $stats['jumlah_transaksi_bulan_ini'] = $result_stats['jumlah_transaksi'] ?? 0;
         $stats['item_unik_dibeli_bulan_ini'] = $result_stats['item_unik'] ?? 0;
     }
-    $sql_low_stock = "SELECT id, nama_barang, jumlah FROM barang WHERE jumlah <= 10 ORDER BY jumlah ASC LIMIT 5";
+
+    // -------------------------------------------------------------------------
+    // >> PERUBAHAN DI SINI << Query untuk Low Stock dengan logika yang benar
+    // -------------------------------------------------------------------------
+    $sql_low_stock = "
+        SELECT
+            nama_barang,
+            SUM(jumlah) AS total_stok
+        FROM
+            barang
+        GROUP BY
+            nama_barang
+        HAVING
+            SUM(jumlah) <= 10
+        ORDER BY
+            total_stok ASC
+        LIMIT 5;
+    ";
     $stmt_low_stock = $conn->prepare($sql_low_stock);
     $stmt_low_stock->execute();
+    // Menggunakan fetchAll untuk mengambil semua baris yang cocok
     $lowStockItems = $stmt_low_stock->fetchAll(PDO::FETCH_ASSOC);
+
+
+    // -------------------------------------------------------------------------
+    // Query untuk chart, bagian ini tidak diubah
+    // -------------------------------------------------------------------------
     $sql_chart = "SELECT DATE(tanggal) as tgl, SUM(jumlah * harga) as total FROM transaksi WHERE tipe = 'masuk' AND tanggal >= CURDATE() - INTERVAL 7 DAY GROUP BY DATE(tanggal) ORDER BY tgl ASC";
     $stmt_chart = $conn->prepare($sql_chart);
     $stmt_chart->execute();
     $chartData = $stmt_chart->fetchAll(PDO::FETCH_ASSOC);
+
+    // Proses data chart, tidak diubah
     $chartLabels = [];
     $chartValues = [];
     for ($i = 6; $i >= 0; $i--) {
@@ -70,9 +103,11 @@ try {
 } catch (Exception $e) {
     $error_message = "Gagal mengambil data dashboard: " . $e->getMessage();
 } finally {
+    // Selalu tutup koneksi
     $conn = null;
 }
 
+// Mengatur locale untuk format tanggal/waktu Indonesia
 setlocale(LC_TIME, 'id_ID.utf8', 'id_ID.UTF-8', 'id_ID');
 ?>
 <!DOCTYPE html>
@@ -183,7 +218,7 @@ setlocale(LC_TIME, 'id_ID.utf8', 'id_ID.UTF-8', 'id_ID');
                                                 </div>
                                                 <div class="text-right ml-4">
                                                     <p class="text-xs text-slate-500">Sisa Stok</p>
-                                                    <p class="font-bold text-2xl text-red-500 leading-tight"><?= e($item['jumlah']) ?></p>
+                                                    <p class="font-bold text-2xl text-red-500 leading-tight"><?= e($item['total_stok']) ?></p>
                                                 </div>
                                             </li>
                                         <?php endforeach; ?>
@@ -220,39 +255,38 @@ setlocale(LC_TIME, 'id_ID.utf8', 'id_ID.UTF-8', 'id_ID');
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../asset/lib/purchase.js"></script>
     <script>
-    const ctx = document.getElementById('purchaseChart');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: <?= $chartLabelsJSON ?? '[]' ?>,
-                datasets: [{
-                    label: 'Total Pembelian',
-                    data: <?= $chartValuesJSON ?? '[]' ?>,
-                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 2,
-                    borderRadius: 8,
-                    barThickness: 20
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    /* ... tooltip ... */
+        const ctx = document.getElementById('purchaseChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: <?= $chartLabelsJSON ?? '[]' ?>,
+                    datasets: [{
+                        label: 'Total Pembelian',
+                        data: <?= $chartValuesJSON ?? '[]' ?>,
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        barThickness: 20
+                    }]
                 },
-                scales: {
-                    /* ... scales ... */
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        /* ... tooltip ... */
+                    },
+                    scales: {
+                        /* ... scales ... */
+                    }
                 }
-            }
-        });
-    }
-</script>
-
+            });
+        }
+    </script>
 </body>
 
 </html>

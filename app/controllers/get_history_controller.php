@@ -1,5 +1,5 @@
 <?php
-// File ini akan mengambil data transaksi berdasarkan role pengguna.
+// File ini akan mengambil data transaksi berdasarkan role pengguna dengan paginasi.
 
 require_once '../../config/Database.php';
 
@@ -29,6 +29,19 @@ if ($userRole === 'Purchasing') {
 $transactions = [];
 $error_message = null;
 
+// --- AWAL PERUBAHAN PAGINASI ---
+
+// 1. Konfigurasi Paginasi
+$limit = 20; // Jumlah baris per halaman
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1; // Halaman saat ini, default ke 1
+if ($page < 1) {
+    $page = 1;
+}
+$offset = ($page - 1) * $limit; // Hitung offset untuk query SQL
+
+// --- AKHIR PERUBAHAN PAGINASI ---
+
+
 try {
     $database = new Database();
     $conn = $database->getConnection();
@@ -37,7 +50,16 @@ try {
         throw new Exception("Gagal terhubung ke database.");
     }
 
-    // Bangun query SQL yang dinamis
+    // --- PERUBAHAN PAGINASI: Query untuk menghitung total baris ---
+    // Query ini harus menggunakan filter (whereClause) yang sama dengan query utama
+    $countSql = "SELECT COUNT(t.id) FROM transaksi t {$whereClause}";
+    $countStmt = $conn->prepare($countSql);
+    $countStmt->execute($params);
+    $total_rows = $countStmt->fetchColumn();
+    $total_pages = ceil($total_rows / $limit);
+    // --- AKHIR PERUBAHAN PAGINASI ---
+
+    // Bangun query SQL yang dinamis dengan LIMIT dan OFFSET
     $sql = "SELECT 
                 t.tanggal, 
                 b.nama_barang, 
@@ -51,13 +73,21 @@ try {
                 barang b ON t.barang_id = b.id
             {$whereClause} -- Sisipkan klausa WHERE dinamis di sini
             ORDER BY 
-                t.tanggal DESC, t.id DESC";
+                t.tanggal DESC, t.id DESC
+            LIMIT :limit OFFSET :offset"; // Tambahkan LIMIT dan OFFSET
 
     $stmt = $conn->prepare($sql);
-    // Jalankan dengan parameter yang sesuai (jika ada)
-    $stmt->execute($params);
-    $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // --- PERUBAHAN PAGINASI: Bind parameter untuk LIMIT dan OFFSET ---
+    // Kita perlu bind parameter secara manual karena execute() mungkin tidak menangani semua tipe data dengan benar
+    foreach ($params as $key => &$val) {
+        $stmt->bindParam($key, $val);
+    }
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+    $stmt->execute();
+    $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $error_message = "Error: " . $e->getMessage();
 } finally {
