@@ -104,7 +104,7 @@ require_once '../controllers/trending_sales_controller.php';
                                                 <?= e($item['nama_barang']) ?>
                                             </th>
                                             <td class="px-6 py-4 text-center text-slate-700 font-medium"><?= e(number_format($item['total_terjual'])) ?></td>
-                                            <td class="px-6 py-4 text-right text-green-600 font-bold">Rp <?= number_format($item['total_revenue'], 0, ',', '.') ?></td>
+                                            <td class="px-6 py-4 text-right text-green-600 font-bold">Rp <?= number_format($item['total_revenue_from_transaction_price'], 0, ',', '.') ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>

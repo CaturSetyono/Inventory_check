@@ -22,7 +22,7 @@ function e($string)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($pageTitle) ?> - InventoriKu</title>
+    <title><?= e($pageTitle) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -121,27 +121,44 @@ function e($string)
                     </div>
 
                     <?php if ($total_pages > 1 && !$error_message && !empty($transactions)): ?>
-                        <div class="mt-8 flex justify-center" aria-label="Pagination">
+                        <div class="mt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0" aria-label="Pagination">
+                            <div>
+                                <p class="text-sm text-slate-600">
+                                    Halaman <span class="font-semibold text-slate-800"><?= $page ?></span> dari <span class="font-semibold text-slate-800"><?= $total_pages ?></span>
+                                </p>
+                            </div>
+
                             <nav class="flex items-center space-x-2">
                                 <a href="?page=<?= $page > 1 ? $page - 1 : 1 ?>"
-                                    class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-300 bg-white text-slate-600 transition-colors hover:bg-slate-100 <?= $page <= 1 ? 'bg-slate-100 text-slate-400 pointer-events-none' : '' ?>">
+                                    class="flex items-center justify-center h-9 w-9 rounded-md bg-white text-slate-500 transition-colors border border-slate-300 hover:bg-slate-100 hover:text-slate-700 <?= $page <= 1 ? 'opacity-50 pointer-events-none' : '' ?>">
                                     <span class="sr-only">Previous</span>
-                                    <i class="fas fa-chevron-left text-sm"></i>
+                                    <i class="fas fa-chevron-left text-xs"></i>
                                 </a>
 
-                                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                                    <a href="?page=<?= $i ?>"
-                                        aria-current="<?= $i == $page ? 'page' : 'false' ?>"
-                                        class="flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-colors
-               <?= $i == $page ? 'bg-sky-500 text-white shadow-lg' : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100' ?>">
-                                        <?= $i ?>
-                                    </a>
-                                <?php endfor; ?>
+                                <?php
+                                $window = 1; // Jumlah halaman di sekitar halaman aktif
+                                for ($i = 1; $i <= $total_pages; $i++):
+                                    // Kondisi untuk menampilkan nomor halaman atau elipsis
+                                    if ($i == 1 || $i == $total_pages || ($i >= $page - $window && $i <= $page + $window)) {
+                                        // Tampilkan link halaman
+                                        echo '<a href="?page=' . $i . '" aria-current="' . ($i == $page ? 'page' : 'false') . '" 
+                    class="flex items-center justify-center h-9 min-w-[2.25rem] px-3 rounded-md font-semibold text-sm transition-all ' .
+                                            ($i == $page
+                                                ? 'bg-sky-500 text-white shadow-md'
+                                                : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100 hover:border-slate-400') . '">
+                    ' . $i . '
+                </a>';
+                                    } elseif ($i == $page - $window - 1 || $i == $page + $window + 1) {
+                                        // Tampilkan elipsis
+                                        echo '<span class="flex items-center justify-center h-9 w-9 text-slate-500">...</span>';
+                                    }
+                                endfor;
+                                ?>
 
                                 <a href="?page=<?= $page < $total_pages ? $page + 1 : $total_pages ?>"
-                                    class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-300 bg-white text-slate-600 transition-colors hover:bg-slate-100 <?= $page >= $total_pages ? 'bg-slate-100 text-slate-400 pointer-events-none' : '' ?>">
+                                    class="flex items-center justify-center h-9 w-9 rounded-md bg-white text-slate-500 transition-colors border border-slate-300 hover:bg-slate-100 hover:text-slate-700 <?= $page >= $total_pages ? 'opacity-50 pointer-events-none' : '' ?>">
                                     <span class="sr-only">Next</span>
-                                    <i class="fas fa-chevron-right text-sm"></i>
+                                    <i class="fas fa-chevron-right text-xs"></i>
                                 </a>
                             </nav>
                         </div>

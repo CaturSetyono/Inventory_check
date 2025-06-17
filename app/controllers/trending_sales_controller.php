@@ -50,23 +50,25 @@ try {
             break;
     }
 
-    // Query untuk mengambil barang terlaris
+    // --- MODIFIKASI QUERY DI SINI ---
+    // Kita akan LEFT JOIN dengan tabel barang, tapi GROUP BY nama_barang
+    // karena transaksi mereferensi ke ID barang per batch.
+    // Kita perlu pastikan nama_barang yang di-JOIN itu adalah nama barang dari batch yang terkait transaksi.
     $query = "SELECT
-                b.id as barang_id,
                 b.nama_barang,
                 SUM(t.jumlah) as total_terjual,
-                COALESCE(SUM(CASE WHEN t.tipe = 'keluar' THEN t.jumlah * t.harga ELSE 0 END), 0) as total_revenue
+                SUM(t.harga * t.jumlah) as total_revenue_from_transaction_price -- Menggunakan harga dari transaksi, bukan harga_beli dari barang
               FROM
                 transaksi t
               JOIN
-                barang b ON t.barang_id = b.id
+                barang b ON t.barang_id = b.id -- Join ke tabel barang untuk mendapatkan nama_barang dari ID batch
               WHERE
                 t.tipe = 'keluar'
                 {$date_clause}
               GROUP BY
-                b.id, b.nama_barang
+                b.nama_barang -- GROUP BY nama_barang, BUKAN b.id, agar semua batch dengan nama sama terakumulasi
               ORDER BY
-                total_terjual DESC, total_revenue DESC
+                total_terjual DESC, total_revenue_from_transaction_price DESC
               LIMIT 10"; // Ambil 10 barang terlaris
 
     $stmt = $db->prepare($query);
