@@ -5,8 +5,8 @@ require_once '../../config/Database.php';
 
 // -- PENGATURAN PENGGUNA & PERAN --
 
-if (!isset($_SESSION['loggedin']) || !in_array($_SESSION['role'], ['Purchasing', 'Admin'])) {
-    header('Location: ../Auth/login.php');
+if (!isset($_SESSION['loggedin']) || !in_array($_SESSION['role'], ['Purchasing'])) {
+    header('Location: ../../Auth/login.php');
     exit;
 }
 

@@ -1,18 +1,20 @@
 <?php
 session_start();
-// Path ke file koneksi database, dari app/views/ ke app/config/
+// Path ke file koneksi database, dari app/views/ ke config/
 require_once '../../config/Database.php';
 
 // Guard: Cek jika pengguna adalah Admin
 if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'Admin') {
-    header('Location: Auth/login.php');
+    header('Location: ../../Auth/login.php'); // Arahkan ke root login
     exit;
 }
 
 // Fungsi helper untuk escaping HTML
-function e($string)
-{
-    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+if (!function_exists('e')) {
+    function e($string)
+    {
+        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    }
 }
 
 // -- PENGAMBILAN DATA DINAMIS DARI DATABASE --
@@ -24,6 +26,11 @@ $barang_masuk_hari_ini = 0;
 $barang_keluar_hari_ini = 0;
 $db_error = null;
 
+// Variabel untuk chart baru
+$chart_labels = [];
+$chart_data_masuk = [];
+$chart_data_keluar = [];
+
 try {
     $database = new Database();
     $db = $database->getConnection();
@@ -34,15 +41,9 @@ try {
     $stmt1->execute();
     $total_jenis_barang = $stmt1->fetchColumn();
 
-    // 2. Menghitung Barang dengan Stok Menipis (misal, stok < 10)
+    // 2. Menghitung Barang dengan Stok Menipis (misal, stok <= 10)
     $stok_menipis_threshold = 10;
-    // Query ini menjumlahkan stok untuk setiap nama barang, lalu menghitung berapa banyak yang totalnya di bawah ambang batas.
-    $query2 = "SELECT COUNT(*) FROM (
-                    SELECT SUM(jumlah) as total_stok 
-                    FROM barang 
-                    GROUP BY nama_barang 
-                    HAVING total_stok < :threshold
-               ) as barang_menipis";
+    $query2 = "SELECT COUNT(*) FROM (SELECT SUM(jumlah) as total_stok FROM barang GROUP BY nama_barang HAVING total_stok <= :threshold) as barang_menipis";
     $stmt2 = $db->prepare($query2);
     $stmt2->bindParam(':threshold', $stok_menipis_threshold, PDO::PARAM_INT);
     $stmt2->execute();
@@ -62,10 +63,45 @@ try {
     $stmt4->bindParam(':today', $today);
     $stmt4->execute();
     $barang_keluar_hari_ini = $stmt4->fetchColumn();
+
+    // 5. MENGAMBIL DATA UNTUK GRAFIK BARU (7 Hari Terakhir)
+    $query_chart = "
+        SELECT
+            tanggal,
+            SUM(CASE WHEN tipe = 'masuk' THEN jumlah ELSE 0 END) as total_masuk,
+            SUM(CASE WHEN tipe = 'keluar' THEN jumlah ELSE 0 END) as total_keluar
+        FROM transaksi
+        WHERE tanggal >= CURDATE() - INTERVAL 6 DAY
+        GROUP BY tanggal
+        ORDER BY tanggal ASC
+    ";
+    $stmt_chart = $db->prepare($query_chart);
+    $stmt_chart->execute();
+    $daily_traffic = $stmt_chart->fetchAll(PDO::FETCH_ASSOC);
+
+    // Proses data untuk format Chart.js
+    $period = new DatePeriod(
+        new DateTime('-6 days'),
+        new DateInterval('P1D'),
+        new DateTime('+1 day')
+    );
+
+    $traffic_map = [];
+    foreach($daily_traffic as $traffic) {
+        $traffic_map[$traffic['tanggal']] = $traffic;
+    }
+
+    foreach ($period as $date) {
+        $day = $date->format('Y-m-d');
+        $chart_labels[] = $date->format('d M'); // Format '17 Jun'
+        $chart_data_masuk[] = $traffic_map[$day]['total_masuk'] ?? 0;
+        $chart_data_keluar[] = $traffic_map[$day]['total_keluar'] ?? 0;
+    }
+
 } catch (PDOException $e) {
     // Jika terjadi error koneksi atau query
-    $db_error = "Error koneksi database: " . $e->getMessage();
-    // Set semua metrik ke 0 atau 'N/A' jika ada error
+    $db_error = "Error koneksi database: " . e($e->getMessage());
+    // Set semua metrik ke 'N/A' jika ada error
     $total_jenis_barang = $stok_menipis_count = $barang_masuk_hari_ini = $barang_keluar_hari_ini = 'N/A';
 }
 
@@ -81,8 +117,9 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../asset/css/purchase.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="bg-slate-100 font-sans">
@@ -101,7 +138,7 @@ try {
                 </button>
                 <div class="relative">
                     <button id="profile-button" class="flex items-center space-x-3">
-                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['nama_lengkap']) ?>&background=0ea5e9&color=fff&size=128" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-slate-300">
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['nama_lengkap']) ?>&background=4f46e5&color=fff&size=128" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-slate-300">
                         <div class="hidden md:block text-right">
                             <span class="font-semibold text-slate-800 text-sm"><?= e($_SESSION['nama_lengkap']) ?></span>
                             <span class="block text-xs text-slate-500"><?= e($_SESSION['role']) ?></span>
@@ -116,11 +153,11 @@ try {
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6 md:p-8">
+            <main class="flex-1 overflow-y-auto p-6">
                 <div class="container mx-auto">
-                    <div class="mb-8">
-                        <h1 class="text-3xl font-bold text-slate-800">Selamat Datang Kembali, <?= e(explode(' ', $_SESSION['nama_lengkap'])[0]); ?>!</h1>
-                        <p class="mt-2 text-slate-600">Berikut adalah ringkasan aktivitas inventaris Anda.</p>
+                    <div class="mb-6">
+                        <h1 class="text-3xl font-extrabold text-slate-800">Dashboard Admin</h1>
+                        <p class="mt-1 text-slate-600">Ringkasan aktivitas inventaris terkini.</p>
                     </div>
 
                     <?php if ($db_error): ?>
@@ -129,71 +166,95 @@ try {
                         </div>
                     <?php endif; ?>
 
-                    <!-- Kartu Ringkasan dengan Data Dinamis -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
-                            <div>
-                                <p class="text-sm font-medium text-slate-500">Total Jenis Barang</p>
-                                <p class="text-3xl font-bold text-slate-800"><?= number_format($total_jenis_barang) ?></p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-gradient-to-br from-sky-500 to-sky-600 text-white p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                            <div class="flex justify-between items-start">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium opacity-80">Total Jenis Barang</span>
+                                    <span class="text-4xl font-extrabold mt-1"><?= e(number_format($total_jenis_barang)) ?></span>
+                                </div>
+                                <i class="fas fa-boxes-stacked fa-3x opacity-20"></i>
                             </div>
-                            <div class="text-sky-500"><i class="fas fa-boxes-stacked fa-2x"></i></div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
-                            <div>
-                                <p class="text-sm font-medium text-slate-500">Stok Menipis</p>
-                                <p class="text-3xl font-bold text-amber-500"><?= number_format($stok_menipis_count) ?></p>
+                        <div class="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                             <div class="flex justify-between items-start">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium opacity-80">Stok Menipis</span>
+                                    <span class="text-4xl font-extrabold mt-1"><?= e(number_format($stok_menipis_count)) ?></span>
+                                </div>
+                                <i class="fas fa-exclamation-triangle fa-3x opacity-20"></i>
                             </div>
-                            <div class="text-amber-500"><i class="fas fa-exclamation-triangle fa-2x"></i></div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
-                            <div>
-                                <p class="text-sm font-medium text-slate-500">Barang Masuk (Hari Ini)</p>
-                                <p class="text-3xl font-bold text-slate-800"><?= number_format($barang_masuk_hari_ini) ?></p>
+                        <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                             <div class="flex justify-between items-start">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium opacity-80">Masuk (Hari Ini)</span>
+                                    <span class="text-4xl font-extrabold mt-1"><?= e(number_format($barang_masuk_hari_ini)) ?></span>
+                                </div>
+                                <i class="fas fa-arrow-down fa-3x opacity-20"></i>
                             </div>
-                            <div class="text-green-500"><i class="fas fa-arrow-down fa-2x"></i></div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
-                            <div>
-                                <p class="text-sm font-medium text-slate-500">Barang Keluar (Hari Ini)</p>
-                                <p class="text-3xl font-bold text-slate-800"><?= number_format($barang_keluar_hari_ini) ?></p>
+                        <div class="bg-gradient-to-br from-red-500 to-red-600 text-white p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                             <div class="flex justify-between items-start">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium opacity-80">Keluar (Hari Ini)</span>
+                                    <span class="text-4xl font-extrabold mt-1"><?= e(number_format($barang_keluar_hari_ini)) ?></span>
+                                </div>
+                                <i class="fas fa-arrow-up fa-3x opacity-20"></i>
                             </div>
-                            <div class="text-red-500"><i class="fas fa-arrow-up fa-2x"></i></div>
                         </div>
                     </div>
 
-                    <!-- Akses Cepat (Path disesuaikan) -->
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Menu Akses Cepat</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                        <a href="#" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
-                            <div class="flex items-center mb-3 text-sky-500"><i class="fas fa-chart-line fa-2x"></i></div>
-                            <h3 class="text-xl font-semibold text-slate-800">Laporan</h3>
-                            <p class="text-slate-500 text-sm mt-1">Lihat laporan penjualan, pembelian, dan keuntungan.</p>
-                        </a>
+                        <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-md">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4">Ringkasan (7 Hari Terakhir)</h3>
+                            <div class="relative h-80">
+                                <canvas id="trafficChart"></canvas>
+                            </div>
+                        </div>
 
-                        <a href="../model/item_list.php" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
-                            <div class="flex items-center mb-3 text-teal-500"><i class="fas fa-boxes-stacked fa-2x"></i></div>
-                            <h3 class="text-xl font-semibold text-slate-800">Manajemen Barang</h3>
-                            <p class="text-slate-500 text-sm mt-1">Kelola data master semua barang di inventaris.</p>
-                        </a>
+                        <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-md flex flex-col">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4">Akses Cepat</h3>
+                            <nav class="flex-1 space-y-3">
+                                <a href="../model/report_sales.php" class="flex items-center p-4 rounded-lg hover:bg-slate-100 transition-colors">
+                                    <i class="fas fa-chart-line text-xl text-sky-500 w-8 text-center"></i>
+                                    <div class="ml-4">
+                                        <h4 class="font-semibold text-slate-700">Laporan</h4>
+                                        <p class="text-xs text-slate-500">Lihat ringkasan penjualan & pembelian.</p>
+                                    </div>
+                                </a>
+                                <a href="../model/item_list.php" class="flex items-center p-4 rounded-lg hover:bg-slate-100 transition-colors">
+                                    <i class="fas fa-boxes-stacked text-xl text-teal-500 w-8 text-center"></i>
+                                    <div class="ml-4">
+                                        <h4 class="font-semibold text-slate-700">Daftar Barang</h4>
+                                        <p class="text-xs text-slate-500">Analisa data master semua barang.</p>
+                                    </div>
+                                </a>
+                                <a href="../model/trending_sales.php" class="flex items-center p-4 rounded-lg hover:bg-slate-100 transition-colors">
+                                    <i class="fas fa-chart-bar text-xl text-indigo-500 w-8 text-center"></i>
+                                     <div class="ml-4">
+                                        <h4 class="font-semibold text-slate-700">Penjualan Terlaris</h4>
+                                        <p class="text-xs text-slate-500">Analisa tren barang paling laku.</p>
+                                    </div>
+                                </a>
+                                <a href="../model/transaction_history.php" class="flex items-center p-4 rounded-lg hover:bg-slate-100 transition-colors">
+                                    <i class="fas fa-history text-xl text-purple-500 w-8 text-center"></i>
+                                    <div class="ml-4">
+                                        <h4 class="font-semibold text-slate-700">Riwayat Transaksi</h4>
+                                        <p class="text-xs text-slate-500">Lacak semua aktivitas inventaris.</p>
+                                    </div>
+                                </a>
+                                <a href="../model/manage_user.php" class="flex items-center p-4 rounded-lg hover:bg-slate-100 transition-colors">
+                                    <i class="fas fa-users-cog text-xl text-slate-500 w-8 text-center"></i>
+                                    <div class="ml-4">
+                                        <h4 class="font-semibold text-slate-700">Manajemen Pengguna</h4>
+                                        <p class="text-xs text-slate-500">Atur hak akses untuk setiap peran.</p>
+                                    </div>
+                                </a>
+                            </nav>
+                        </div>
 
-                        <a href="#" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
-                            <div class="flex items-center mb-3 text-indigo-500"><i class="fas fa-chart-bar fa-2x"></i></div>
-                            <h3 class="text-xl font-semibold text-slate-800">Penjualan Terlaris</h3>
-                            <p class="text-slate-500 text-sm mt-1">Analisa tren barang yang paling laku di pasaran.</p>
-                        </a>
-
-                        <a href="../model/transaction_history.php" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
-                            <div class="flex items-center mb-3 text-purple-500"><i class="fas fa-history fa-2x"></i></div>
-                            <h3 class="text-xl font-semibold text-slate-800">Riwayat Transaksi</h3>
-                            <p class="text-slate-500 text-sm mt-1">Lacak semua aktivitas pembelian dan penjualan.</p>
-                        </a>
-
-                        <a href="../model/manage_user.php" class="block p-6 bg-white rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-sky-500 border-2 border-transparent">
-                            <div class="flex items-center mb-3 text-slate-500"><i class="fas fa-users-cog fa-2x"></i></div>
-                            <h3 class="text-xl font-semibold text-slate-800">Manajemen Pengguna</h3>
-                            <p class="text-slate-500 text-sm mt-1">Atur hak akses dan akun untuk setiap peran.</p>
-                        </a>
                     </div>
                 </div>
             </main>
@@ -212,9 +273,72 @@ try {
         </div>
     </div>
 
-    <!-- Semua JS yang dibutuhkan sudah dihandle oleh sidebar dan halaman lain -->
     <script src="../asset/lib/purchase.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('trafficChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar', // Tipe grafik bar
+                    data: {
+                        labels: <?= json_encode($chart_labels) ?>,
+                        datasets: [{
+                            label: 'Barang Masuk',
+                            data: <?= json_encode($chart_data_masuk) ?>,
+                            backgroundColor: 'rgba(34, 197, 94, 0.6)', // Warna hijau
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Barang Keluar',
+                            data: <?= json_encode($chart_data_keluar) ?>,
+                            backgroundColor: 'rgba(239, 68, 68, 0.6)', // Warna merah
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e2e8f0' // Warna grid lebih soft
+                                },
+                                ticks: {
+                                    color: '#64748b' // Warna teks sumbu Y
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false // Hilangkan grid vertikal
+                                },
+                                ticks: {
+                                    color: '#64748b' // Warna teks sumbu X
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 </body>
-
 </html>

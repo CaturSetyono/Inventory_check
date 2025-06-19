@@ -228,6 +228,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </form>
         </div>
     </div>
+    
     <div id="logout-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm mx-auto text-center transform transition-all scale-95 opacity-0" id="logout-modal-content">
             <div class="mb-4"><i class="fas fa-exclamation-triangle text-5xl text-yellow-400"></i></div>
@@ -239,6 +240,36 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
+
+      </form>
+        </div>
+    </div> <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 modal-enter">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md transform transition-all">
+            <form id="deleteUserForm" action="../controllers/process_user.php" method="POST">
+                <div class="p-6 text-center">
+                    <i class="fas fa-exclamation-triangle text-5xl text-yellow-400 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-slate-800">Konfirmasi Hapus</h2>
+                    <p class="mt-2 text-slate-600">
+                        Apakah Anda yakin ingin menghapus pengguna <strong id="deleteUserName" class="font-semibold"></strong>? 
+                        <br>
+                        Tindakan ini tidak dapat diurungkan.
+                    </p>
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="id" id="deleteUserId">
+                </div>
+                <div class="px-6 py-4 bg-slate-50 rounded-b-lg flex justify-center space-x-4">
+                    <button type="button" class="cancel-modal-btn bg-white hover:bg-slate-100 text-slate-700 font-bold py-2 px-6 rounded-lg border border-slate-300 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                        Ya, Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="logout-modal" class="hidden ...">
+    ```
 
     <script src="../asset/lib/purchase.js"></script>
     <script src="../asset/lib/add_user.js"></script>

@@ -39,7 +39,7 @@ $userRole = $_SESSION['role'] ?? 'Guest'; // Default ke 'Guest' kalo session gak
     <!-- Logo untuk Desktop -->
     <div id="logo-container" class="hidden md:flex items-center justify-center p-6 h-16 border-b border-slate-700">
         <i class="fas fa-boxes-stacked text-3xl text-sky-400"></i>
-        <span class="sidebar-text text-2xl font-bold ml-3">tokoobat</span>
+        <span class="sidebar-text text-2xl font-bold ml-3">IKU</span>
     </div>
 
     <!-- Navigasi Utama -->
@@ -56,11 +56,13 @@ $userRole = $_SESSION['role'] ?? 'Guest'; // Default ke 'Guest' kalo session gak
                 <a href="<?= BASE_URL ?>app/views/admin_dashboard.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'dashboard') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-tachometer-alt w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Dashboard</span>
                 </a>
+                <a href="<?= BASE_URL ?>app/controllers/item_list_controller.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'items') ? $activeClass : $inactiveClass ?>">
+                    <i class="fas fa-boxes-stacked w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Daftar Barang</span>
+                </a>
                 <a href="<?= BASE_URL ?>app/model/report_sales.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'reports') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-chart-line w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Laporan</span>
                 </a>
-
-                 <a href="<?= BASE_URL ?>app/model/trending_sales.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'trending') ? $activeClass : $inactiveClass ?>">
+                <a href="<?= BASE_URL ?>app/model/trending_sales.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'trending') ? $activeClass : $inactiveClass ?>">
                     <i class="fas fa-chart-bar w-6 text-center text-lg"></i><span class="sidebar-text ml-4">Penjualan Terlaris</span>
                 </a>
                 <a href="<?= BASE_URL ?>app/model/transaction_history.php" class="nav-link flex items-center py-3 px-4 transition duration-200 rounded-lg <?= ($currentPage === 'history') ? $activeClass : $inactiveClass ?>">

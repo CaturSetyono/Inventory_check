@@ -67,3 +67,8 @@ try {
 // Controller memberikan semua variabel yang sudah diolah ke View.
 // Path dari 'app/controllers/' ke 'app/model/' adalah '../model/'
 require_once '../model/item_list.php';
+
+
+
+
+
