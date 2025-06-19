@@ -7,10 +7,7 @@ if (!isset($_SESSION['loggedin']) || !in_array($_SESSION['role'], ['Sales', 'Adm
     header('Location: ../../Auth/login.php');
     exit;
 }
-if (!isset($_SESSION['nama_lengkap'])) { // Mock data untuk development
-    $_SESSION['nama_lengkap'] = 'Sales Person';
-    $_SESSION['role'] = 'Sales';
-}
+
 if (!function_exists('e')) {
     function e($string)
     {
@@ -115,7 +112,7 @@ $sisa_target = $target_penjualan_bulanan - $stats['penjualan_bulanan'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Dashboard - InventoriKu</title>
+    <title>Sales Dashboard - IKU</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -130,7 +127,7 @@ $sisa_target = $target_penjualan_bulanan - $stats['penjualan_bulanan'];
         include '../components/sidebar.php';
         ?>
         <div id="main-content" class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm p-4 h-16 flex justify-between items-center z-10">
+            <header class="bg-white shadow-sm p-8 h-16 flex justify-between items-center z-10">
                 <div class="flex items-center">
                     <button id="sidebar-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none bg-slate-200/70 hover:bg-slate-300 w-10 h-10 rounded-full items-center justify-center hidden md:flex">
                         <i id="sidebar-toggle-icon" class="fas fa-chevron-left text-xl"></i>

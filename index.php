@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./app/asset/css/style.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
@@ -42,75 +44,28 @@
                     },
                     keyframes: {
                         fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(20px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            },
                         },
                     },
                 }
             }
         }
     </script>
-    <style>
-        /* General Styling */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-base-100);
-            color: var(--color-text-secondary);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Heading Styling */
-        h1, h2, h3 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600; /* Semibold untuk tampilan modern */
-            color: var(--color-text-primary);
-            letter-spacing: -0.025em;
-        }
-
-        /* Scroll Reveal Effect (sangat halus) */
-        .scroll-reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .scroll-reveal.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Video Background Styling */
-        .hero-video-container {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            z-index: -1;
-        }
-        .hero-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
-            filter: brightness(0.6); /* Lebih gelap untuk kontras teks yang lebih baik */
-        }
-        .hero-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 60%);
-        }
-    </style>
 </head>
+
 <body class="bg-base-100">
 
     <header class="bg-base-100/80 backdrop-blur-lg sticky top-0 z-50 border-b border-base-300">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold text-text-primary">
-                IKU
+            <a href="./" class="text-xl font-bold text-text-primary">
+                IKU Inc.
             </a>
             <a href="Auth/login.php" class="bg-brand-blue text-white font-medium text-sm px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-300">
                 Masuk
@@ -128,7 +83,7 @@
         </div>
         <div class="container relative mx-auto px-6 z-10 animate-fade-in-up">
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight md:leading-snug">
-                Manajemen Inventaris, <br class="hidden md:block"> Disederhanakan untuk <span class="text-blue-300">Pertumbuhan</span>.
+                Manajemen Inventaris, <br class="hidden md:block"> mudah dengan akses yang <span class="text-blue-300">Real Time</span>.
             </h1>
             <p class="mt-4 max-w-xl mx-auto text-base md:text-lg text-slate-200">
                 Ubah cara Anda mengelola stok dengan platform cerdas yang memprediksi, mengotomatisasi, dan mengoptimalkan.
@@ -145,7 +100,7 @@
         <div class="container mx-auto px-6">
             <div class="text-center max-w-2xl mx-auto mb-16 scroll-reveal">
                 <h2 class="text-3xl md:text-4xl">Fitur Intuitif untuk Bisnis Modern</h2>
-                <p class="mt-4 text-lg">Semua yang Anda butuhkan untuk kendali penuh atas inventaris Anda, dalam satu dasbor yang rapi.</p>
+                <p class="mt-4 text-lg">Semua yang Anda butuhkan untuk kendali penuh atas inventaris Anda, dalam satu dashboard yang rapi.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -176,12 +131,12 @@
 
     <section class="py-24 md:py-32 bg-base-100">
         <div class="container mx-auto px-6 text-center scroll-reveal">
-            <h2 class="text-3xl md:text-4xl max-w-xl mx-auto">Siap Mengambil Kendali Penuh?</h2>
+            <h2 class="text-3xl md:text-4xl max-w-xl mx-auto">Siap bertumbuh bersama kami?</h2>
             <p class="mt-4 text-lg max-w-2xl mx-auto">
-                Tinggalkan cara manual. Mulai optimalkan profit bisnis Anda hari ini dengan Inventro.io.
+                Tinggalkan cara manual, Mulai optimalkan profit bisnis Anda hari ini dengan IKU Inc.
             </p>
             <div class="mt-10">
-                <a href="#" target="_blank" class="bg-brand-blue text-white font-semibold text-lg py-3 px-10 rounded-lg shadow-lg hover:bg-opacity-90 transition-colors transform hover:-translate-y-1 duration-300 inline-flex items-center">
+                <a href="https://wa.me/6281393667609?text=Saya%20Tertarik%20dengan%20IKU%20Inc%2C%20bisa%20bantu%20jelaskan%20lebih%20lanjut%3F" target="_blank" class="bg-brand-blue text-white font-semibold text-lg py-3 px-10 rounded-lg shadow-lg hover:bg-opacity-90 transition-colors transform hover:-translate-y-1 duration-300 inline-flex items-center">
                     Dapatkan Penawaran
                 </a>
             </div>
@@ -190,11 +145,7 @@
 
     <footer class="bg-base-200 border-t border-base-300 text-text-secondary">
         <div class="container mx-auto px-6 py-12 text-center">
-            <p class="text-sm">&copy; <?= date("Y") ?>PT Inventory Karya Usaha Seluruh Hak Cipta.</p>
-            <div class="mt-4 text-sm">
-                <a href="#" class="hover:text-brand-blue transition-colors mr-4">Kebijakan Privasi</a>
-                <a href="#" class="hover:text-brand-blue transition-colors">Syarat & Ketentuan</a>
-            </div>
+            <p class="text-sm">&copy; <?= date("Y ") ?>IKU Inc. All rights reserved.</p>
         </div>
     </footer>
 
@@ -207,7 +158,9 @@
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.1 }); // Muncul saat 10% elemen terlihat
+            }, {
+                threshold: 0.1
+            }); // Muncul saat 10% elemen terlihat
 
             document.querySelectorAll('.scroll-reveal').forEach(el => {
                 observer.observe(el);
@@ -216,4 +169,5 @@
     </script>
 
 </body>
+
 </html>
