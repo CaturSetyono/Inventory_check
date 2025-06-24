@@ -159,7 +159,26 @@ try {
         ?>
 
         <div id="main-content" class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm p-4 h-16 flex justify-between items-center z-10">
+            <div id="main-content" class="flex-1 flex flex-col min-h-screen">
+            <header class="bg-white shadow-sm p-8 h-16 flex justify-between items-center z-10">
+                <button id="sidebar-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none bg-slate-200/70 hover:bg-slate-300 w-10 h-10 rounded-full flex items-center justify-center">
+                    <i id="sidebar-toggle-icon" class="fas fa-chevron-left text-xl"></i>
+                </button>
+                <div class="relative">
+                    <button id="profile-button" class="flex items-center space-x-3">
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['nama_lengkap']) ?>&background=0ea5e9&color=fff&size=128" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-slate-300">
+                        <div class="hidden md:block text-right">
+                            <span class="font-semibold text-gray-800 text-sm"><?= e($_SESSION['nama_lengkap']) ?></span>
+                            <span class="block text-xs text-gray-500"><?= e($_SESSION['role']) ?></span>
+                        </div>
+                    </button>
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"><i class="fas fa-user-circle w-5 mr-2"></i>Profil</a>
+                        <button type="button" class="logout-trigger block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-100">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i>Logout
+                        </button>
+                    </div>
+                </div>
             </header>
 
             <main class="flex-1 overflow-y-auto p-6 md:p-8">
@@ -212,8 +231,6 @@ try {
                                 </form>
                             </div>
                         </div>
-
-                 
 
                         <div class="lg:col-span-3">
                             <div class="bg-white rounded-xl shadow-lg h-full">

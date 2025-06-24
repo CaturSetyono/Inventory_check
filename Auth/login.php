@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Inventro</title>
+    <title>Login - IKU Inc.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -95,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-primary">Inventro</h1>
+            <h1 class="text-3xl font-bold text-primary">IKU Inc.</h1>
             <p class="text-gray-500 mt-2">Silakan login untuk melanjutkan</p>
         </div>
 
