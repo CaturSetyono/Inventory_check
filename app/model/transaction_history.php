@@ -38,7 +38,7 @@ function e($string)
         ?>
 
         <div id="main-content" class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white p-4 h-16 flex justify-between items-center z-10">
+            <header class="bg-white p-8 h-16 flex justify-between items-center z-10">
                 <button id="sidebar-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none bg-slate-200/70 hover:bg-slate-300 w-10 h-10 rounded-full flex items-center justify-center">
                     <i id="sidebar-toggle-icon" class="fas fa-chevron-left text-xl"></i>
                 </button>

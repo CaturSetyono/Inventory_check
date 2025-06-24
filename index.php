@@ -195,48 +195,7 @@
             <p class="text-sm">&copy; <?= date("Y") ?> IKU Inc. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        // Menjalankan skrip setelah seluruh konten halaman (DOM) selesai dimuat.
-        document.addEventListener('DOMContentLoaded', () => {
-            // Membuat observer baru untuk memantau apakah elemen masuk ke dalam viewport.
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    // Jika elemen yang diamati (entry) sedang terlihat (isIntersecting).
-                    if (entry.isIntersecting) {
-                        // Tambahkan class 'is-visible' untuk memicu animasi.
-                        entry.target.classList.add('is-visible');
-                        // Hentikan pengamatan pada elemen ini setelah animasi berjalan sekali.
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                // Animasi akan terpicu jika 10% dari elemen terlihat di layar.
-                threshold: 0.1
-            });
-
-            // Memilih semua elemen dengan class '.scroll-reveal' untuk diberi efek animasi.
-            document.querySelectorAll('.scroll-reveal').forEach(el => {
-                // Atur style awal elemen agar tidak terlihat dan sedikit bergeser ke bawah.
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(20px)';
-                el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                // Mulai mengamati elemen ini.
-                observer.observe(el);
-            });
-
-            // Membuat dan menyisipkan rule CSS untuk class '.is-visible' secara dinamis.
-            // Ini memastikan animasi transisi dapat berjalan dengan benar.
-            const style = document.createElement('style');
-            style.innerHTML = `
-                .is-visible {
-                    opacity: 1 !important;
-                    transform: translateY(0) !important;
-                }
-            `;
-            document.head.appendChild(style);
-        });
-    </script>
+    
 
 </body>
 

@@ -1,37 +1,39 @@
 <?php
-session_start();
+// File: app/controllers/daftar_barang_controller.php
+
+// Pastikan session selalu dimulai di awal
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // 1. MEMUAT DEPENDENSI & KONFIGURASI
-// Path dari 'app/controllers/' ke 'config/' adalah '../../config/'
 require_once '../../config/Database.php'; 
 
 // 2. FUNGSI BANTU (HELPERS)
-
-
-// 3. LOGIKA UTAMA (OTAK DARI HALAMAN)
-
-// Pengaturan Pengguna & Peran (Guard)
-// Aktifkan blok ini di lingkungan produksi
-/*
-if (!isset($_SESSION['loggedin']) || !in_array($_SESSION['role'], ['Purchasing', 'Admin', 'Sales'])) {
-    header('Location: ../views/Auth/login.php'); 
-    exit;
+// Fungsi untuk 'escaping' output HTML agar aman dari serangan XSS
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
-*/
-if (!isset($_SESSION['nama_lengkap'])) {
-    $_SESSION['nama_lengkap'] = 'Staff Gudang';
+
+// 3. LOGIKA UTAMA
+
+// -- PENGATURAN PENGGUNA & PERAN --
+// Ini adalah data simulasi, di lingkungan produksi, Anda akan menggunakan data sesi asli.
+if (!isset($_SESSION['loggedin'])) {
+    // Data dummy jika tidak ada sesi login
+    $_SESSION['nama_lengkap'] = 'Staf Gudang';
     $_SESSION['role'] = 'Purchasing';
 }
 
-// Logika Pagination
-$limit = 30;
+// -- LOGIKA PAGINATION & FILTER --
+$limit = 30; // Jumlah item per halaman
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) {
     $page = 1;
 }
-$offset = ($page - 1) * $limit;
+$offset = ($page - 1) * $limit; // Menghitung offset untuk query SQL
 
-// Variabel untuk menampung data yang akan dikirim ke View
+// -- PENGAMBILAN DATA DARI DATABASE --
 $items = [];
 $total_items = 0;
 $total_pages = 0;
@@ -41,14 +43,21 @@ try {
     $db = new Database();
     $conn = $db->getConnection();
 
-    // Query untuk menghitung total semua barang
-    $total_stmt = $conn->query("SELECT COUNT(id) FROM barang");
+    // Query pertama: Hitung total barang yang stoknya TIDAK NOL untuk pagination
+    $total_stmt = $conn->query("SELECT COUNT(id) FROM barang WHERE jumlah > 0");
     $total_items = $total_stmt->fetchColumn();
     $total_pages = ceil($total_items / $limit);
 
-    // Query untuk mengambil data barang per halaman
+    // Pastikan halaman tidak melebihi total halaman yang ada
+    if ($page > $total_pages && $total_pages > 0) {
+        $page = $total_pages;
+        $offset = ($page - 1) * $limit;
+    }
+
+    // Query kedua: Ambil data barang yang stoknya TIDAK NOL sesuai halaman saat ini
     $query = "SELECT id, nama_barang, jumlah, harga_beli, tanggal 
               FROM barang 
+              WHERE jumlah > 0
               ORDER BY tanggal DESC, id DESC 
               LIMIT :limit OFFSET :offset";
     
@@ -63,12 +72,6 @@ try {
 }
 
 // 4. MEMUAT FILE TAMPILAN (VIEW)
-// Setelah semua data siap, panggil file View-nya.
-// Controller memberikan semua variabel yang sudah diolah ke View.
-// Path dari 'app/controllers/' ke 'app/model/' adalah '../model/'
+// Setelah semua logika selesai dan data siap, controller memanggil file view.
+// Semua variabel di atas ($items, $page, dll.) akan tersedia di file view.
 require_once '../model/item_list.php';
-
-
-
-
-

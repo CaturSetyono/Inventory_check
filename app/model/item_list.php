@@ -1,60 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-// Path ke Database.php saya sesuaikan agar konsisten dengan path lain di file ini.
-require_once '../../config/Database.php'; 
-// -- PENGATURAN PENGGUNA & PERAN --
-// (Tidak ada perubahan di sini)
-/*
-if (!isset($_SESSION['loggedin']) || !in_array($_SESSION['role'], ['Purchasing', 'Admin', 'Sales'])) {
-    header('Location: ../views/Auth/login.php'); 
-    exit;
-}
-*/
-if (!isset($_SESSION['nama_lengkap'])) {
-    $_SESSION['nama_lengkap'] = 'Staff Gudang';
-    $_SESSION['role'] = 'Purchasing';
-}
-
-
-// -- LOGIKA PAGINATION --
-$limit = 30; // 1. Jumlah item per halaman
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($page < 1) {
-    $page = 1;
-}
-$offset = ($page - 1) * $limit; // 2. Menghitung offset untuk query SQL
-
-$items = [];
-$total_items = 0;
-$error_message = null;
-
-try {
-    $db = new Database();
-    $conn = $db->getConnection();
-
-    // 3. Query pertama: Hitung total semua barang untuk pagination
-    $total_stmt = $conn->query("SELECT COUNT(id) FROM barang");
-    $total_items = $total_stmt->fetchColumn();
-    $total_pages = ceil($total_items / $limit);
-
-    // 4. Query kedua: Ambil data barang sesuai halaman saat ini (dengan LIMIT dan OFFSET)
-    $query = "SELECT id, nama_barang, jumlah, harga_beli, tanggal 
-              FROM barang 
-              ORDER BY tanggal DESC, id DESC 
-              LIMIT :limit OFFSET :offset";
-    
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
-    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (PDOException $e) {
-    $error_message = "Gagal mengambil data dari database: " . $e->getMessage();
-}
-
+// File: app/views/daftar_barang_view.php
+// File ini hanya berisi HTML dan logika sederhana untuk menampilkan data.
+// Semua variabel seperti $items, $page, $total_pages, dll. berasal dari controller.
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -62,21 +9,22 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Barang (Hal. <?= $page ?>) - InventoriKu</title>
+    <title>Daftar Barang (Hal. <?= e($page) ?>) - InventoriKu</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../asset/css/purchase.css">
-</head>
+    <link rel="stylesheet" href="../asset/css/purchase.css"> </head>
 
 <body class="bg-slate-100">
     <div class="relative min-h-screen md:flex">
         <?php
-        $currentPage = 'items';
-        require_once '../components/sidebar.php';
+        // Memuat komponen sidebar
+        $currentPage = 'items'; // Untuk menandai menu aktif di sidebar
+        require_once '../components/sidebar.php'; // Pastikan path ini benar
         ?>
 
         <div id="main-content" class="flex-1 flex flex-col min-h-screen">
@@ -106,9 +54,8 @@ try {
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h1 class="text-3xl font-bold text-slate-800">Daftar Barang</h1>
-                            <p class="mt-2 text-slate-600">Lihat semua data barang yang tersimpan di database.</p>
+                            <p class="mt-2 text-slate-600">Menampilkan semua barang dengan stok tersedia.</p>
                         </div>
-                        
                     </div>
 
                     <div class="bg-white p-6 md:p-8 rounded-lg shadow-md overflow-x-auto">
@@ -137,10 +84,7 @@ try {
                                             </td>
                                         </tr>
                                     <?php else: ?>
-                                        <?php 
-                                        // Nomor urut dimulai dari offset + 1
-                                        $nomor = $offset + 1; 
-                                        ?>
+                                        <?php $nomor = $offset + 1; ?>
                                         <?php foreach ($items as $item): ?>
                                             <tr class="bg-white border-b hover:bg-gray-50">
                                                 <td class="px-6 py-4 font-medium text-gray-900"><?= $nomor++ ?></td>
@@ -156,41 +100,38 @@ try {
                                     <?php endif; ?>
                                 </tbody>
                             </table>
-                        <?php endif; ?>
                         
-                        <?php if ($total_pages > 1): ?>
-                        <nav class="flex items-center justify-between pt-4" aria-label="Table navigation">
-                            <span class="text-sm font-normal text-gray-500">
-                                Menampilkan <span class="font-semibold text-gray-900"><?= $offset + 1 ?>-<?= $offset + count($items) ?></span> 
-                                dari <span class="font-semibold text-gray-900"><?= $total_items ?></span>
-                            </span>
-                            <ul class="inline-flex items-center -space-x-px">
-                                <li>
-                                    <a href="?page=<?= $page > 1 ? $page - 1 : 1 ?>" 
-                                       class="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 <?= ($page <= 1) ? 'cursor-not-allowed opacity-50' : '' ?>">
-                                        <span class="sr-only">Previous</span>
-                                        <i class="fas fa-chevron-left w-3 h-3"></i>
-                                    </a>
-                                </li>
-                                <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                                <li>
-                                    <a href="?page=<?= $i ?>" 
-                                       class="px-3 py-2 leading-tight border border-gray-300 <?= ($i == $page) ? 'text-blue-600 bg-blue-50' : 'text-gray-500 bg-white hover:bg-gray-100' ?>">
-                                        <?= $i ?>
-                                    </a>
-                                </li>
-                                <?php endfor; ?>
-                                <li>
-                                    <a href="?page=<?= $page < $total_pages ? $page + 1 : $total_pages ?>" 
-                                       class="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 <?= ($page >= $total_pages) ? 'cursor-not-allowed opacity-50' : '' ?>">
-                                        <span class="sr-only">Next</span>
-                                        <i class="fas fa-chevron-right w-3 h-3"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                            <?php if ($total_pages > 1): ?>
+                            <nav class="flex items-center justify-between pt-4" aria-label="Table navigation">
+                                <span class="text-sm font-normal text-gray-500">
+                                    Menampilkan <span class="font-semibold text-gray-900"><?= $offset + 1 ?>-<?= $offset + count($items) ?></span> 
+                                    dari <span class="font-semibold text-gray-900"><?= $total_items ?></span>
+                                </span>
+                                <ul class="inline-flex items-center -space-x-px">
+                                    <li>
+                                        <a href="?page=<?= $page > 1 ? $page - 1 : 1 ?>" 
+                                           class="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 <?= ($page <= 1) ? 'cursor-not-allowed opacity-50' : '' ?>">
+                                            <i class="fas fa-chevron-left w-3 h-3"></i>
+                                        </a>
+                                    </li>
+                                    <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                                    <li>
+                                        <a href="?page=<?= $i ?>" 
+                                           class="px-3 py-2 leading-tight border border-gray-300 <?= ($i == $page) ? 'text-blue-600 bg-blue-50 hover:bg-blue-100' : 'text-gray-500 bg-white hover:bg-gray-100' ?>">
+                                            <?= $i ?>
+                                        </a>
+                                    </li>
+                                    <?php endfor; ?>
+                                    <li>
+                                        <a href="?page=<?= $page < $total_pages ? $page + 1 : $total_pages ?>" 
+                                           class="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 <?= ($page >= $total_pages) ? 'cursor-not-allowed opacity-50' : '' ?>">
+                                            <i class="fas fa-chevron-right w-3 h-3"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <?php endif; ?>
                         <?php endif; ?>
-
                     </div>
                 </div>
             </main>
@@ -209,6 +150,5 @@ try {
         </div>
     </div>
 
-    <script src="../asset/lib/purchase.js"></script>
-</body>
+    <script src="../asset/lib/purchase.js"></script> </body>
 </html>

@@ -116,7 +116,7 @@ setlocale(LC_TIME, 'id_ID.utf8', 'id_ID.UTF-8', 'id_ID');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dasbor Purchasing - InventoriKu</title>
+    <title>Dashboard Purchasing - IKU</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -132,7 +132,7 @@ setlocale(LC_TIME, 'id_ID.utf8', 'id_ID.UTF-8', 'id_ID');
         ?>
 
         <div id="main-content" class="flex-1 flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm p-4 h-16 flex justify-between items-center z-10">
+            <header class="bg-white shadow-sm p-8 h-16 flex justify-between items-center z-10">
                 <button id="sidebar-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none bg-slate-200/70 hover:bg-slate-300 w-10 h-10 rounded-full flex items-center justify-center">
                     <i id="sidebar-toggle-icon" class="fas fa-chevron-left text-xl"></i>
                 </button>

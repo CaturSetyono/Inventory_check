@@ -37,9 +37,8 @@ $userRole = $_SESSION['role'] ?? 'Guest'; // Default ke 'Guest' kalo session gak
     </div>
 
     <!-- Logo untuk Desktop -->
-    <div id="logo-container" class="hidden md:flex items-center justify-center p-6 h-16 border-b border-slate-700">
-        <i class="fas fa-boxes-stacked text-3xl text-sky-400"></i>
-        <span class="sidebar-text text-2xl font-bold ml-3">IKU</span>
+    <div id="logo-container" class="hidden md:flex items-center justify-center p-6 h-16 border-b border-slate-700"> 
+        <span class="sidebar-text text-2xl font-bold ml-3">IKU Inc.</span>
     </div>
 
     <!-- Navigasi Utama -->
